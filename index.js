@@ -150,19 +150,30 @@ app.put("/api/songs/updateSong/:id",(req,res)=>{
         return res.send(error.details[0].message);
     }
 
-    song.songName = req.body.songName,
-    song.genre = req.body.genre,
-    song.artist = req.body.artist,
-    song.album = req.body.album,
-    song.releasedYear = req.body.releasedYear,
-    song.producer = req.body.producer,
-    song.price = req.body.price,
-    song.availableOnYoutube = req.body.availableOnYoutube,
-    song.views = req.body.views
+    song.songName = req.body.songName;
+    song.genre = req.body.genre;
+    song.artist = req.body.artist;
+    song.album = req.body.album;
+    song.releasedYear = req.body.releasedYear;
+    song.producer = req.body.producer;
+    song.price = req.body.price;
+    song.availableOnYoutube = req.body.availableOnYoutube;
+    song.views = req.body.views;
     res.send(songs);
-
-
 });
+
+//Delete song by ID
+
+app.delete("/api/songs/removeSong/:id",(req,res)=>{
+    let song = songs.find((data)=>data.id === parseInt(req.params.id));
+    if(!song){
+        return res.status(404).send({message:"Invalid Song ID"});
+    }
+
+    let index = songs.indexOf(song);
+    songs.splice(index,1);
+    res.send(songs);
+})
 
 app.listen(port,()=>console.log(`Port is Working on ${port}`));
 
