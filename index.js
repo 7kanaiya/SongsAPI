@@ -72,7 +72,7 @@ let songs = [{
 //Fetching all songs
 app.get("/api/songs/allList",(req,res)=>{
     res.send(songs);
-})
+});
 
 //Fetching songs by ID
 app.get("/api/songs/songById/:id",(req,res)=>{
@@ -84,7 +84,7 @@ app.get("/api/songs/songById/:id",(req,res)=>{
         return res.status(404).send({message:"Song Not Available"});
     }
     res.send(song);
-})
+});
 
 //Adding new song
 
@@ -93,8 +93,8 @@ app.post("/api/songs/createSong",(req,res)=>{
     //creating the schema of accepted string
     let schema = joi.object({
         songName: joi.string().min(2).max(100).required(),
-        releasedYear:  joi.number().min(4).max(4).required(),
-        price: joi.number().min(3).max(5).required()
+        releasedYear:  joi.number().max(2020).required(),
+        price: joi.number().required()
     });
 
     //Validating the data with schema created
@@ -122,7 +122,47 @@ app.post("/api/songs/createSong",(req,res)=>{
     }
     songs.push(song);
     res.send(songs);
-})
+});
+
+//Updations in the existing song
+
+app.put("/api/songs/updateSong/:id",(req,res)=>{
+    //checking requesting id is valid or not
+    let song = songs.find((item)=>item.id === parseInt(req.params.id));
+    if(!song){
+        return res.status(404).send({message:"Invalid Song ID"});
+    }
+
+    //creating the schema of accepted string
+    let schema = joi.object({
+    songName: joi.string().min(2).max(100).required(),
+    releasedYear:  joi.number().max(2020),
+    price: joi.number()
+    });
+    
+    //Validating the data with schema created
+    let result = schema.validate(req.body,options={allowUnknown: true});
+    //Object destructuring
+    let {error} = result;
+    //let {error} = schema.validate(req.body); more optimized
+
+    if(error){
+        return res.send(error.details[0].message);
+    }
+
+    song.songName = req.body.songName,
+    song.genre = req.body.genre,
+    song.artist = req.body.artist,
+    song.album = req.body.album,
+    song.releasedYear = req.body.releasedYear,
+    song.producer = req.body.producer,
+    song.price = req.body.price,
+    song.availableOnYoutube = req.body.availableOnYoutube,
+    song.views = req.body.views
+    res.send(songs);
+
+
+});
 
 app.listen(port,()=>console.log(`Port is Working on ${port}`));
 
